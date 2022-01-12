@@ -34,10 +34,20 @@ async function main() {
     // ERC-721 based metadata record
     const metadata = {
       title: 'Asset Metadata',
+      type: 'object',
       properties: {
-          name: 'Crypto Logos',
-          description: `${coin.name} (${coin.symbol.toUpperCase()})`,
-          image: coin.image
+        name: {
+          type: 'string',
+          description: 'Crypto Logos'
+        },
+        description: {
+          type: 'string',
+          description: `${coin.name} (${coin.symbol.toUpperCase()})`
+        },
+        image: {
+          type: 'string',
+          description: coin.image
+        }
       }
     }
 
@@ -48,7 +58,7 @@ async function main() {
 
       await contract.mint(nftOwner, result.data.id);
       console.log(`Minted logo NFT for ${coin.name.padEnd(15, ' ')} | id=${result.data.id}`);
-    });
+    }).catch(_ => console.log('Backend server unavailable'));
   }
 }
 
