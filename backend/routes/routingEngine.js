@@ -3,27 +3,37 @@ const storage = require('../storage.js');
 
 const router = express.Router();
 
-router.post('/add', function(req, res) {
-  res.json({success: true, id: storage.save(req.body)});
+router.post('/savecontract', function(req, res) {
+  storage.saveContractAddress(req.body.address);
+  res.json({success: true});
 });
 
-router.get('/get', function(req, res) {
-  if(!req.query.from) {
-    res.json({success: false});
-    return;
-  }
+router.post('/savemetadata', function(req, res) {
+  res.json({success: true, id: storage.saveMetadata(req.body)});
+});
 
-  const result = storage.getByIds(req.query.from, req.query.to);
+router.get('/getcontract', function(req, res) {
+  const result = storage.getContractAddress();
 
-  if(result === []) {
+  if(!result) {
     res.json({success: false});
   } else {
-    res.json({success: true, count: result});
+    res.json({success: true, address: result});
   }
 });
 
-router.get('/count', function(req, res) {
-  res.json({success: true, count: storage.entriesCount()});
+router.get('/getmetadata&id=:id', function(req, res) {
+  const result = storage.getMetadataById(req.params.id);
+
+  if(!result) {
+    res.json({success: false});
+  } else {
+    res.json({success: true, metadata: result});
+  }
+});
+
+router.get('/metadatacount', function(req, res) {
+  res.json({success: true, count: storage.metadataCount()});
 });
 
 module.exports = router;

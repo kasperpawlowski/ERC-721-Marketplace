@@ -3,10 +3,18 @@ const fs = require('fs');
 const STORAGE_FILE_PATH = './storage.json';
 
 if(!fs.existsSync(STORAGE_FILE_PATH)) {
-  fs.writeFileSync(STORAGE_FILE_PATH, JSON.stringify({counter: 0, metadata: {}}));
+  fs.writeFileSync(STORAGE_FILE_PATH, JSON.stringify({address: '', counter: 0, metadata: {}}));
 }
 
-const save = metadata => {
+const saveContractAddress = address => {
+    const storage = JSON.parse(fs.readFileSync(STORAGE_FILE_PATH));
+    storage.address = address;
+    storage.counter = 0;
+    storage.metadata = {};
+    fs.writeFileSync(STORAGE_FILE_PATH, JSON.stringify(storage));
+}
+
+const saveMetadata = metadata => {
     const storage = JSON.parse(fs.readFileSync(STORAGE_FILE_PATH));
     const currentId = storage.counter;
     storage.metadata[currentId] = metadata;
@@ -15,24 +23,28 @@ const save = metadata => {
     return currentId;
 }
 
-const getByIds = (from, to=0) => {
+const getContractAddress = () => {
     const storage = JSON.parse(fs.readFileSync(STORAGE_FILE_PATH));
 
-    if(from >= to || from >= storage.counter) {
-        return [];
-    } else if(to == 0) {
-        return storage.metadata[from];
+    if(storage.address === '') {
+        return undefined;
+    } else {
+        return storage.address;
     }
-
-    let result = [];
-    for(let i=from; i<to; i++) {
-        result.push(storage.metadata[i]);
-    }
-    return result;
 }
 
-const entriesCount = () => {
+const getMetadataById = (id) => {
+    const storage = JSON.parse(fs.readFileSync(STORAGE_FILE_PATH));
+
+    if(id >= storage.counter) {
+        return undefined;
+    } else {
+        return storage.metadata[id];
+    }
+}
+
+const metadataCount = () => {
     return JSON.parse(fs.readFileSync(STORAGE_FILE_PATH)).counter;
 }
 
-module.exports = {save, getByIds, entriesCount};
+module.exports = {saveContractAddress, getContractAddress, saveMetadata, getMetadataById, metadataCount};
