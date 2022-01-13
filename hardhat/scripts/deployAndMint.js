@@ -26,9 +26,12 @@ async function main() {
   await logos.deployed();
   console.log('CryptoLogos contract deployed to:', logos.address);
 
-  const coins = await getCoingeckoCoinsList(20);
+  const coins = await getCoingeckoCoinsList(50);
   const contract = await hre.ethers.getContractAt("CryptoLogos", logos.address);
   const nftOwner = (await ethers.getSigner(0)).address;
+
+  await axios.post(BACKEND_API_URL('savecontract'), {address: logos.address})
+    .catch(_ => console.log('Backend server unavailable: savecontract'));
 
   for(let coin of coins) {
     // ERC-721 based metadata record
@@ -51,14 +54,14 @@ async function main() {
       }
     }
 
-    await axios.post(BACKEND_API_URL('add'), metadata).then(async result => {
+    await axios.post(BACKEND_API_URL('savemetadata'), metadata).then(async result => {
       if(!result.data.success) {
         console.log(`Error: minting logo NFT for ${coin.name} was unsuccessful`)
       }
 
       await contract.mint(nftOwner, result.data.id);
       console.log(`Minted logo NFT for ${coin.name.padEnd(15, ' ')} | id=${result.data.id}`);
-    }).catch(_ => console.log('Backend server unavailable'));
+    }).catch(_ => console.log('Backend server unavailable: savemetadata'));
   }
 }
 

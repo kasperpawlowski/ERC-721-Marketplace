@@ -16,6 +16,6 @@ contract CryptoLogos is ERC721 {
     }
 
     function _baseURI() internal view override returns (string memory) {
-        return "http://127.0.0.1:3001/get/";
+        return "http://127.0.0.1:3001/getmetadata&id=";
     }
 }
